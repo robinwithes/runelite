@@ -540,6 +540,7 @@ public class WidgetID
 		static final int AUTO_RETALIATE = 30;
 	}
 
+
 	static class VolcanicMine
 	{
 		static final int GENERAL_INFOBOX_GROUP_ID = 4;
