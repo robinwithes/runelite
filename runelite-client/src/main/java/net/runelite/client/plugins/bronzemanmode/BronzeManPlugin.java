@@ -280,6 +280,9 @@ public class BronzeManPlugin extends Plugin {
 
     @Subscribe
     public void onChatMessage(ChatMessage chatMessage) {
+        if (!chatMessage.getName().equals(client.getLocalPlayer().getName())) {
+            return;
+        }
         if (config.resetCommand() && chatMessage.getMessage().toLowerCase().equals("!reset")) {
             resetUnlocks();
         }
