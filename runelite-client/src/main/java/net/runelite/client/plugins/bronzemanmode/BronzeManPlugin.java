@@ -280,7 +280,11 @@ public class BronzeManPlugin extends Plugin {
 
     @Subscribe
     public void onChatMessage(ChatMessage chatMessage) {
-        if (!chatMessage.getName().equals(client.getLocalPlayer().getName())) {
+        String messageSender = chatMessage.getName();
+        String playerName = client.getLocalPlayer().getName();
+        messageSender = messageSender.replace(" ", ""); //The space in the first arg is not a space but a special character
+        playerName = playerName.replace(" ", "");
+        if (!messageSender.equals(playerName)) {
             return;
         }
         if (config.resetCommand() && chatMessage.getMessage().toLowerCase().equals("!reset")) {
