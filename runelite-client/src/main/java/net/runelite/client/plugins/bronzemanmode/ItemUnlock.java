@@ -31,8 +31,14 @@ public class ItemUnlock {
     /**
      * Returns whether or not an items has been displayed as unlocked yet
      **/
-    public boolean displayed() {
-        return System.currentTimeMillis() > initTime + (5000);
+    public boolean finishedDisplaying(int queue) {
+        if (queue > 2) {
+            return System.currentTimeMillis() > initTime + (750);
+        }
+        else {
+            return System.currentTimeMillis() > initTime + (4000);
+        }
+
     }
 
 }
