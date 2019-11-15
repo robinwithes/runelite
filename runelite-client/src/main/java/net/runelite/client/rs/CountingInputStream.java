@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019 Abex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,33 +22,60 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.api.events;
+package net.runelite.client.rs;
 
-import lombok.Data;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.function.IntConsumer;
 
-/**
- * An event where a configuration entry has been modified.
- */
-@Data
-public class ConfigChanged
+class CountingInputStream extends FilterInputStream
 {
-	/**
-	 * The parent group for the key.
-	 * <p>
-	 * Typically set to the name of a plugin to prevent potential collisions
-	 * between other key values that may have the same name.
-	 */
-	private String group;
-	/**
-	 * The configuration key that has been modified.
-	 */
-	private String key;
-	/**
-	 * The previous value of the entry.
-	 */
-	private String oldValue;
-	/**
-	 * The new value of the entry, null if the entry has been unset.
-	 */
-	private String newValue;
+	private final IntConsumer changed;
+
+	CountingInputStream(InputStream in, IntConsumer changed)
+	{
+		super(in);
+		this.changed = changed;
+	}
+
+	private int read = 0;
+
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException
+	{
+		int thisRead = super.read(b, off, len);
+		if (thisRead > 0)
+		{
+			this.read += thisRead;
+		}
+		changed.accept(this.read);
+		return thisRead;
+	}
+
+	@Override
+	public int read() throws IOException
+	{
+		int val = super.read();
+		if (val != -1)
+		{
+			this.read++;
+		}
+		return val;
+	}
+
+	@Override
+	public long skip(long n) throws IOException
+	{
+		long thisRead = in.skip(n);
+		this.read += thisRead;
+		changed.accept(this.read);
+		return thisRead;
+	}
+
+	@Override
+	public boolean markSupported()
+	{
+		return false;
+	}
 }
